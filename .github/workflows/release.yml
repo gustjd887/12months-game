@@ -2,44 +2,30 @@ name: Release Go Binaries
 on:
   push:
     tags: ['v*']
+permissions:
+  contents: write
+  id-token: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
-          - os: linux
-            arch: amd64
-            ext: ''
-            goos: linux
-            goarch: amd64
-          - os: darwin
-            arch: arm64
-            ext: ''
-            goos: darwin
-            goarch: arm64
-          - os: windows
-            arch: amd64
-            ext: '.exe'
-            goos: windows
-            goarch: amd64
+          - os: linux   arch: amd64  ext: ''
+          - os: darwin  arch: arm64  ext: ''
+          - os: windows arch: amd64  ext: '.exe'
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-go@v5
-      with:
-        go-version: '1.22'
+      with: { go-version: '1.22' }
     - run: go mod download
     - name: Build
       run: |
-        GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -ldflags="-s -w" -trimpath -o 12months-game${{ matrix.ext }} .
-    - name: Package
-      run: |
-        zip -r 12months-game-${{ matrix.os }}-${{ matrix.arch }}.zip 12months-game${{ matrix.ext }}
-    - name: Release
+        GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -ldflags="-s -w" -trimpath -o 12months-game${{ matrix.ext }} .
+    - name: Release  # zip 단계 제거!
       uses: softprops/action-gh-release@v2
       with:
-        files: |
-          12months-game${{ matrix.ext }}
-          12months-game-${{ matrix.os }}-${{ matrix.arch }}.zip
+        files: 12months-game${{ matrix.ext }}  # 바이너리만 업로드
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
