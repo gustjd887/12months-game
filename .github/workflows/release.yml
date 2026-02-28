@@ -11,21 +11,32 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          - os: linux   arch: amd64  ext: ''
-          - os: darwin  arch: arm64  ext: ''
-          - os: windows arch: amd64  ext: '.exe'
+        platform: 
+          - os: linux
+            arch: amd64
+            ext: ''
+          - os: darwin
+            arch: arm64
+            ext: ''
+          - os: windows
+            arch: amd64
+            ext: '.exe'
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-go@v5
-      with: { go-version: '1.22' }
-    - run: go mod download
-    - name: Build
-      run: |
-        GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -ldflags="-s -w" -trimpath -o 12months-game${{ matrix.ext }} .
-    - name: Release  # zip 단계 제거!
-      uses: softprops/action-gh-release@v2
-      with:
-        files: 12months-game${{ matrix.ext }}  # 바이너리만 업로드
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          
+      - run: go mod download
+      
+      - name: Build
+        run: |
+          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -ldflags="-s -w" -trimpath -o 12months-game${{ matrix.ext }} .
+          
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: 12months-game${{ matrix.ext }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
