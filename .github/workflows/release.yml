@@ -21,7 +21,7 @@ jobs:
       - name: Build binary (linux/amd64)
         run: |
           mkdir -p release
-          GOOS=linux GOARCH=amd64 go build -o release/game
+          GOOS=linux GOARCH=amd64 go build -o release/12-months-game
 
       - name: Create GitHub Release
         id: create_release
